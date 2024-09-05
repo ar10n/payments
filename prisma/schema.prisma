@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model Company {
+  id      Int    @id @default(autoincrement())
+  name    String
+  balance Int    @default(0)
+
+  transactions Transaction[]
+}
+
+model Partner {
+  id   Int    @id @default(autoincrement())
+  name String
+  inn  String @unique
+
+  transactions Transaction[]
+}
+
+model Transaction {
+  id      Int      @id @default(autoincrement())
+  amount  Float
+  comment String?
+  income  Boolean  @default(true)
+  date    DateTime @default(now()) @db.Date
+
+  Company   Company? @relation(fields: [companyId], references: [id])
+  companyId Int?
+  Partner   Partner? @relation(fields: [partnerId], references: [id])
+  partnerId Int?
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  tgId      Int      @unique
+  name      String?
+  isActive  Boolean  @default(false)
+  createdAt DateTime @default(now()) @db.Date
+}

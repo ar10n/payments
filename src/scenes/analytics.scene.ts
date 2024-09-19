@@ -1,12 +1,11 @@
 import { Markup, Scenes } from "telegraf";
 import { MyContext } from "../index";
 import { callbackQuery } from "telegraf/filters";
-import { callback } from "telegraf/typings/button";
 
 export const analyticsScene = new Scenes.BaseScene<MyContext>('analytics');
 
 analyticsScene.enter(async (ctx): Promise<void> => {
-    await ctx.reply(
+    const { message_id } = await ctx.reply(
         'Выберите шаблон для показа аналитики:',
         Markup.inlineKeyboard([
             Markup.button.callback('Общая сумма', 'sum-all'),
@@ -16,12 +15,13 @@ analyticsScene.enter(async (ctx): Promise<void> => {
             Markup.button.callback('Общая по контрагенту', 'sum-partner'),
             Markup.button.callback('5 последних по контрагенту', 'five-partner'),
             Markup.button.callback('Выход', 'exit')
-        ], {columns: 2})
+        ], { columns: 2 })
     );
+    ctx.session.msgId = message_id;
 });
 
-analyticsScene.on(callbackQuery('data'), async (ctx): Promise<void> => {
-    await ctx.answerCbQuery();
+analyticsScene.on(callbackQuery('data'), async (ctx): Promise<boolean> => {
+    await ctx.deleteMessage();
     switch (ctx.callbackQuery.data) {
         case 'sum-all':
             await ctx.scene.enter('sum-all');
@@ -45,4 +45,5 @@ analyticsScene.on(callbackQuery('data'), async (ctx): Promise<void> => {
             await ctx.scene.enter('mainScene');
             break;
     }
+    return await ctx.answerCbQuery();
 });

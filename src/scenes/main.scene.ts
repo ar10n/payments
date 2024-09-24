@@ -7,12 +7,15 @@ export const mainScene = new Scenes.BaseScene<MyContext>('mainScene');
 mainScene.enter(async (ctx): Promise<void> => {
     const { message_id } = await ctx.reply(
         'Выбор действия:',
-        Markup.inlineKeyboard([
-            Markup.button.callback('Добавить компанию', 'addCompany'),
-            Markup.button.callback('Добавить контрагента', 'addPartner'),
-            Markup.button.callback('Добавить платеж', 'addPayment'),
-            Markup.button.callback('Аналитика', 'analytics')
-        ], { columns: 2 })
+        Markup.inlineKeyboard(
+            [
+                Markup.button.callback('Добавить компанию', 'addCompany'),
+                Markup.button.callback('Добавить контрагента', 'addPartner'),
+                Markup.button.callback('Добавить платеж', 'addPayment'),
+                Markup.button.callback('Аналитика', 'analytics'),
+            ],
+            { columns: 2 },
+        ),
     );
     ctx.session.msgId = message_id;
 });
@@ -35,5 +38,5 @@ mainScene.on(callbackQuery('data'), async (ctx): Promise<boolean> => {
         default:
             await ctx.scene.reenter();
     }
-    return ctx.answerCbQuery();
+    return await ctx.answerCbQuery();
 });

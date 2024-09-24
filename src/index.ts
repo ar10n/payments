@@ -38,12 +38,12 @@ bot.command('start', async (ctx): Promise<void> => {
         await ctx.deleteMessage(ctx.session.msgId);
     }
     const user: User | null = await prisma.user.findUnique({
-        where: {tgId: ctx.message.from.id},
+        where: { tgId: ctx.message.from.id },
     });
     if (user && user.isActive) {
         await ctx.scene.enter('mainScene');
     } else {
-        await prisma.user.create({data: {tgId: ctx.message.from.id}});
+        await prisma.user.create({ data: { tgId: ctx.message.from.id } });
         await ctx.reply(
             'Вы не являетесь действующим пользователем, свяжитесь с @sar10n.',
         );

@@ -7,9 +7,9 @@ import {
     addPaymentAmountScene,
     addPaymentIncomeScene,
     addPaymentDateScene,
-    addPaymentCommentScene
+    addPaymentCommentScene,
 } from './addPayment.scene';
-import { analyticsScene } from "./analytics.scene";
+import { analyticsScene } from './analytics.scene';
 
 export const allScenes = [
     mainScene,
@@ -22,5 +22,5 @@ export const allScenes = [
     addPaymentIncomeScene,
     addPaymentDateScene,
     addPaymentCommentScene,
-    analyticsScene
+    analyticsScene,
 ];

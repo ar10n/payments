@@ -18,38 +18,40 @@ addPartnerNameScene.enter(async (ctx): Promise<void> => {
 });
 
 addPartnerNameScene.on(callbackQuery(), async (ctx): Promise<boolean> => {
-    ctx.deleteMessage();
+    await ctx.deleteMessage();
     await ctx.scene.enter('mainScene');
     return await ctx.answerCbQuery();
 });
 
 addPartnerNameScene.on(message('text'), async (ctx): Promise<void> => {
+    await ctx.deleteMessage(ctx.session.msgId);
     ctx.session.partnerName = ctx.message.text.trim();
     await ctx.scene.enter('addPartnerInn');
 });
 
 addPartnerInnScene.enter(async (ctx): Promise<void> => {
-    await ctx.reply(
+    const { message_id } = await ctx.reply(
         'Введите ИНН нового контрагента и отправьте сообщение, или нажмите "Выход" для возврата в меню.',
         Markup.inlineKeyboard([Markup.button.callback('Выход', 'exit')]),
     );
+    ctx.session.msgId = message_id;
 });
 
-addPartnerInnScene.action('exit', async (ctx): Promise<void> => {
-    await ctx.answerCbQuery();
+addPartnerInnScene.action('exit', async (ctx): Promise<boolean> => {
     ctx.session.partnerName = undefined;
     await ctx.scene.enter('mainScene');
+    return await ctx.answerCbQuery();
 });
 
 addPartnerInnScene.on(message('text'), async (ctx): Promise<void> => {
+    await ctx.deleteMessage(ctx.session.msgId);
     ctx.session.partnerInn = ctx.message.text.trim();
-    const partner = await prisma.partner.create({
+    await prisma.partner.create({
         data: {
             name: ctx.session.partnerName!,
             inn: ctx.session.partnerInn,
         },
     });
-    await ctx.reply(`Создан контрагент ${partner.name} с ИНН ${partner.inn}.`);
     ctx.session.partnerName = undefined;
     ctx.session.partnerInn = undefined;
     await ctx.scene.enter('mainScene');
